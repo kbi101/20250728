@@ -164,7 +164,7 @@ const App = () => {
           ctx.moveTo(start.x, start.y);
           ctx.lineTo(end.x, end.y);
           ctx.strokeStyle = color; // Use default link color
-          ctx.lineWidth = 1; // Link line width 1
+          ctx.lineWidth = 0.5; // Link line width 0.5
           ctx.stroke();
 
           // Draw type on hover
@@ -180,6 +180,8 @@ const App = () => {
             ctx.fillText(link.type, p.x, p.y - 5); // Display type slightly above the link
           }
         }}
+        linkDirectionalArrowLength={3.5}
+        linkDirectionalArrowRelPos={1}
       />
       {contextMenu && (
         <div 
