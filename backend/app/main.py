@@ -81,6 +81,10 @@ def export_data():
 def get_labels():
     return crud.get_all_labels()
 
+@app.get("/relationship_types", response_model=List[str])
+def get_relationship_types():
+    return crud.get_all_relationship_types()
+
 @app.post("/utils/import")
 async def import_data(file: UploadFile = File(...)):
     # Clear database

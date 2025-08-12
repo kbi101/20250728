@@ -106,3 +106,8 @@ def get_all_labels() -> list[str]:
     query = "CALL db.labels()"
     result = db.query(query)
     return [record["label"] for record in result]
+
+def get_all_relationship_types() -> list[str]:
+    query = "CALL db.relationshipTypes()"
+    result = db.query(query)
+    return [record["relationshipType"] for record in result]

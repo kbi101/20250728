@@ -8,6 +8,8 @@ const App = () => {
   const [newNodeLabels, setNewNodeLabels] = useState(''); // New state for labels
   const [availableLabels, setAvailableLabels] = useState([]); // New state for available labels
   const [newEdge, setNewEdge] = useState({ source: { id: '', name: '' }, target: { id: '', name: '' } });
+  const [newEdgeType, setNewEdgeType] = useState(''); // New state for edge type
+  const [availableRelationshipTypes, setAvailableRelationshipTypes] = useState([]); // New state for available relationship types
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
   const graphRef = useRef();
@@ -41,10 +43,20 @@ const App = () => {
     }
   }, []);
 
+  const fetchRelationshipTypes = useCallback(async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/relationship_types');
+      setAvailableRelationshipTypes(response.data);
+    } catch (error) {
+      console.error('Error fetching relationship types:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchGraph();
-    fetchLabels(); // Fetch labels when component mounts
-  }, [fetchGraph, fetchLabels]);
+    fetchLabels();
+    fetchRelationshipTypes(); // Fetch relationship types when component mounts
+  }, [fetchGraph, fetchLabels, fetchRelationshipTypes]);
 
   const handleAddNode = async () => {
     if (!newNode.trim()) {
@@ -73,14 +85,16 @@ const App = () => {
       alert('Both source and target nodes must be selected');
       return;
     }
+    const edgeType = newEdgeType.trim() || 'RELATED_TO'; // Default type if none provided
     try {
       await axios.post('http://localhost:8000/relations', { 
         startNode: newEdge.source.id, 
         endNode: newEdge.target.id, 
-        type: 'RELATED_TO',
+        type: edgeType,
         properties: {}
       });
       setNewEdge({ source: { id: '', name: '' }, target: { id: '', name: '' } });
+      setNewEdgeType(''); // Clear edge type input
       fetchGraph();
     } catch (error) {
       console.error('Error adding edge:', error);
@@ -230,6 +244,26 @@ const App = () => {
             placeholder="Target Node (Right-click a node)"
             style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
           />
+          <input
+            type="text"
+            value={newEdgeType}
+            onChange={(e) => setNewEdgeType(e.target.value)}
+            placeholder="Relationship Type"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
+          />
+          {availableRelationshipTypes.length > 0 && (
+            <select
+              onChange={(e) => setNewEdgeType(e.target.value)}
+              style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
+            >
+              <option value="">Select Type</option>
+              {availableRelationshipTypes.map(type => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
+          )}
           <button onClick={handleAddEdge} style={{ width: '100%', padding: '10px', marginTop: '10px' }}>Add Edge</button>
         </div>
       </div>
