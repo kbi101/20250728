@@ -13,6 +13,7 @@ const App = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
   const [hoveredLink, setHoveredLink] = useState(null); // New state for hovered link
+  const [hoveredNode, setHoveredNode] = useState(null); // New state for hovered node
   const [nodeNameFilter, setNodeNameFilter] = useState('');
   const [nodeLabelFilter, setNodeLabelFilter] = useState('');
   const [edgeTypeFilter, setEdgeTypeFilter] = useState('');
@@ -144,6 +145,7 @@ const App = () => {
         graphData={graphData}
         onNodeDragEnd={handleNodeDragEnd}
         onNodeRightClick={handleNodeRightClick}
+        onNodeHover={node => setHoveredNode(node)} // New prop for node hover
         cooldownTicks={0}
         nodeCanvasObject={(node, ctx, globalScale) => {
           const label = node.name;
@@ -157,6 +159,14 @@ const App = () => {
           ctx.stroke(); // Draw stroke instead of fill
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 10);
+
+          // Display description on hover
+          if (node === hoveredNode) {
+            const desc = node.properties?.desc || node.name; // Use desc or default to name
+            ctx.font = `${fontSize}px Sans-Serif`; // Regular font for description
+            ctx.fillStyle = 'gray';
+            ctx.fillText(desc, node.x, node.y + 25); // Display description below name
+          }
         }}
         nodeVal={10}
         nodeRelSize={5}
