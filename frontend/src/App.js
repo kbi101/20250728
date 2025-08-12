@@ -133,6 +133,19 @@ const App = () => {
         onNodeDragEnd={handleNodeDragEnd}
         onNodeRightClick={handleNodeRightClick}
         cooldownTicks={0}
+        nodeCanvasObject={(node, ctx, globalScale) => {
+          const label = node.name;
+          const fontSize = 12 / globalScale;
+          ctx.font = `${fontSize}px Sans-Serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#00008B'; // Dark Blue
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false); // Node size 5
+          ctx.fill();
+          ctx.fillStyle = 'black';
+          ctx.fillText(label, node.x, node.y + 10);
+        }}
         nodeVal={10}
         nodeRelSize={5}
         linkLabel="type"
@@ -140,11 +153,22 @@ const App = () => {
         linkDirectionalArrowRelPos={1}
         onLinkHover={link => setHoveredLink(link)}
         linkCanvasObject={(link, ctx, color) => {
-          if (link === hoveredLink) {
-            const start = link.source;
-            const end = link.target;
-            if (!start || !end) return;
+          const start = link.source;
+          const end = link.target;
 
+          // ignore if link not yet rendered
+          if (!start || !end) return;
+
+          // Draw link line
+          ctx.beginPath();
+          ctx.moveTo(start.x, start.y);
+          ctx.lineTo(end.x, end.y);
+          ctx.strokeStyle = color; // Use default link color
+          ctx.lineWidth = 1; // Link line width 1
+          ctx.stroke();
+
+          // Draw type on hover
+          if (link === hoveredLink) {
             const interpolate = (start, end, t) => ({ x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t });
             const p = interpolate(start, end, 0.5); // Mid-point of the link
 
