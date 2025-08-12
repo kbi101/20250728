@@ -136,13 +136,13 @@ const App = () => {
         nodeCanvasObject={(node, ctx, globalScale) => {
           const label = node.name;
           const fontSize = 12 / globalScale;
-          ctx.font = `${fontSize}px Sans-Serif`;
+          ctx.font = `bold ${fontSize}px Sans-Serif`; // Make font bold
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
-          ctx.fillStyle = '#00008B'; // Dark Blue
+          ctx.strokeStyle = '#00008B'; // Dark Blue for stroke
           ctx.beginPath();
           ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false); // Node size 5
-          ctx.fill();
+          ctx.stroke(); // Draw stroke instead of fill
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 10);
         }}
