@@ -123,6 +123,7 @@ def export_data(name_filter: str = None, label_filter: str = None, type_filter: 
         if rel['startNode'] in unique_nodes_dict and rel['endNode'] in unique_nodes_dict:
             final_relations.append(rel)
     print(f"Final relations count: {len(final_relations)}")
+    print(f"Nodes returned to frontend: {list(unique_nodes)}")
 
     return {"nodes": list(unique_nodes), "relations": final_relations}
 

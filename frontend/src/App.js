@@ -2,6 +2,28 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import axios from 'axios';
 
+// Helper functions for cookies
+const setCookie = (name, value, days) => {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+};
+
+const getCookie = (name) => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for(let i=0;i < ca.length;i++) {
+    let c = ca[i];
+    while (c.charAt(0)===' ') c = c.substring(1,c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+};
+
 const App = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [newNode, setNewNode] = useState('');
@@ -66,13 +88,23 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    fetchGraph(); // Initial fetch without filters
+    const savedFilters = getCookie('graphFilters');
+    let initialFilters = {};
+    if (savedFilters) {
+      initialFilters = JSON.parse(savedFilters);
+      setNodeNameFilter(initialFilters.nodeNameFilter || '');
+      setNodeLabelFilter(initialFilters.nodeLabelFilter || '');
+      setEdgeTypeFilter(initialFilters.edgeTypeFilter || '');
+    }
+    fetchGraph(initialFilters); // Initial fetch with filters from cookie
     fetchLabels();
     fetchRelationshipTypes(); // Fetch relationship types when component mounts
   }, [fetchGraph, fetchLabels, fetchRelationshipTypes]);
 
   const handleSearch = () => {
-    fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter });
+    const filters = { nodeNameFilter, nodeLabelFilter, edgeTypeFilter };
+    setCookie('graphFilters', JSON.stringify(filters), 7); // Save for 7 days
+    fetchGraph(filters);
   };
 
   const handleAddNode = async () => {
