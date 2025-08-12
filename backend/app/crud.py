@@ -53,9 +53,24 @@ def delete_node(node_id: str):
     query = "MATCH (n {id: $node_id}) DETACH DELETE n"
     db.query(query, parameters={"node_id": node_id})
 
-def list_nodes(skip: int = 0, limit: int = 10) -> list[dict]:
-    query = "MATCH (n) RETURN n SKIP $skip LIMIT $limit"
-    result = db.query(query, parameters={"skip": skip, "limit": limit})
+def list_nodes(skip: int = 0, limit: int = 10, name_filter: str = None, label_filter: str = None) -> list[dict]:
+    query_parts = ["MATCH (n)"]
+    where_clauses = []
+    parameters = {"skip": skip, "limit": limit}
+
+    if name_filter:
+        where_clauses.append("n.properties.name CONTAINS $name_filter")
+        parameters["name_filter"] = name_filter
+
+    if label_filter:
+        where_clauses.append(f"n:{label_filter}")
+
+    if where_clauses:
+        query_parts.append("WHERE " + " AND ".join(where_clauses))
+
+    query_parts.append("RETURN n SKIP $skip LIMIT $limit")
+    query = " ".join(query_parts)
+    result = db.query(query, parameters=parameters)
     return [_node_to_dict(record["n"]) for record in result]
 
 def create_relation(relation: Relation) -> dict | None:
@@ -97,9 +112,21 @@ def delete_relation(relation_id: str):
     query = "MATCH ()-[r {id: $relation_id}]-() DELETE r"
     db.query(query, parameters={"relation_id": relation_id})
 
-def list_relations(skip: int = 0, limit: int = 10) -> list[dict]:
-    query = "MATCH (a)-[r]->(b) RETURN type(r) as type, r.id as id, r as properties, a.id as startNode, b.id as endNode SKIP $skip LIMIT $limit"
-    result = db.query(query, parameters={"skip": skip, "limit": limit})
+def list_relations(skip: int = 0, limit: int = 10, type_filter: str = None) -> list[dict]:
+    query_parts = ["MATCH (a)-[r]->(b)"]
+    where_clauses = []
+    parameters = {"skip": skip, "limit": limit}
+
+    if type_filter:
+        where_clauses.append("type(r) = $type_filter")
+        parameters["type_filter"] = type_filter
+
+    if where_clauses:
+        query_parts.append("WHERE " + " AND ".join(where_clauses))
+
+    query_parts.append("RETURN type(r) as type, r.id as id, r as properties, a.id as startNode, b.id as endNode SKIP $skip LIMIT $limit")
+    query = " ".join(query_parts)
+    result = db.query(query, parameters=parameters)
     return [_relation_to_dict(record) for record in result]
 
 def get_all_labels() -> list[str]:

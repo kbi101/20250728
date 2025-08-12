@@ -210,11 +210,11 @@ const App = () => {
         <div 
           style={{ 
             position: 'absolute', 
-            left: contextMenu.x, 
-            top: contextMenu.y, 
-            background: 'white', 
-            border: '1px solid #ccc', 
-            padding: '10px', 
+            left: contextMenu.x,
+            top: contextMenu.y,
+            background: 'white',
+            border: '1px solid #ccc',
+            padding: '10px',
             zIndex: 1000 
           }}
           onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
@@ -240,8 +240,8 @@ const App = () => {
             position: 'absolute', 
             left: '-30px', 
             top: '10px', 
-            background: '#fff', 
-            border: '1px solid #ccc', 
+            background: '#fff',
+            border: '1px solid #ccc',
             borderRight: 'none',
             padding: '10px 5px',
             cursor: 'pointer'

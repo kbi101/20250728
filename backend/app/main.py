@@ -42,8 +42,8 @@ def delete_node(node_id: str):
     return {"message": "Node deleted"}
 
 @app.get("/nodes", response_model=List[models.Node])
-def list_nodes(skip: int = 0, limit: int = 10):
-    return crud.list_nodes(skip, limit)
+def list_nodes(skip: int = 0, limit: int = 10, name_filter: str = None, label_filter: str = None):
+    return crud.list_nodes(skip, limit, name_filter, label_filter)
 
 @app.post("/relations", response_model=models.Relation)
 def create_relation(relation: models.Relation):
@@ -68,10 +68,14 @@ def delete_relation(relation_id: str):
     crud.delete_relation(relation_id)
     return {"message": "Relation deleted"}
 
+@app.get("/relations_list", response_model=List[models.Relation])
+def list_relations_filtered(skip: int = 0, limit: int = 10, type_filter: str = None):
+    return crud.list_relations(skip, limit, type_filter)
+
 @app.get("/utils/export")
-def export_data():
-    nodes = crud.list_nodes(limit=1000)
-    relations = crud.list_relations(limit=1000)
+def export_data(name_filter: str = None, label_filter: str = None, type_filter: str = None):
+    nodes = crud.list_nodes(limit=1000, name_filter=name_filter, label_filter=label_filter)
+    relations = crud.list_relations(limit=1000, type_filter=type_filter)
 
     unique_nodes = {node['id']: node for node in nodes}.values()
 
