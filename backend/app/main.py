@@ -74,12 +74,57 @@ def list_relations_filtered(skip: int = 0, limit: int = 10, type_filter: str = N
 
 @app.get("/utils/export")
 def export_data(name_filter: str = None, label_filter: str = None, type_filter: str = None):
-    nodes = crud.list_nodes(limit=1000, name_filter=name_filter, label_filter=label_filter)
-    relations = crud.list_relations(limit=1000, type_filter=type_filter)
+    print(f"Received filters: name_filter={name_filter}, label_filter={label_filter}, type_filter={type_filter}")
+    filtered_nodes = crud.list_nodes(limit=1000, name_filter=name_filter, label_filter=label_filter)
+    print(f"Filtered nodes count: {len(filtered_nodes)}")
+    filtered_relations = crud.list_relations(limit=1000, type_filter=type_filter)
+    print(f"Filtered relations count: {len(filtered_relations)}")
 
-    unique_nodes = {node['id']: node for node in nodes}.values()
+    print(f"filtered_nodes content before check: {filtered_nodes}")
+    if not filtered_nodes:
+        print("Node filter applied and no nodes found. Returning empty graph.")
+        return {"nodes": [], "relations": []}
 
-    return {"nodes": list(unique_nodes), "relations": relations}
+    # If node filters are applied, relations should only be between filtered nodes
+    if (name_filter and name_filter.strip()) or (label_filter and label_filter.strip()):
+        nodes_in_filter_set = {node['id'] for node in filtered_nodes}
+        filtered_relations_by_nodes = []
+        for rel in filtered_relations:
+            if rel['startNode'] in nodes_in_filter_set or rel['endNode'] in nodes_in_filter_set:
+                filtered_relations_by_nodes.append(rel)
+        filtered_relations = filtered_relations_by_nodes
+        print(f"Filtered relations (after node-based filtering): {len(filtered_relations)}")
+
+    # Collect all node IDs from filtered relations
+    related_node_ids = set()
+    for rel in filtered_relations:
+        related_node_ids.add(rel['startNode'])
+        related_node_ids.add(rel['endNode'])
+
+    # Get nodes that were filtered out but are part of a filtered relation
+    additional_nodes = []
+    existing_node_ids = {node['id'] for node in filtered_nodes}
+    for node_id in related_node_ids:
+        if node_id not in existing_node_ids:
+            node = crud.get_node(node_id)
+            if node:
+                additional_nodes.append(node)
+
+    all_nodes = filtered_nodes + additional_nodes
+    unique_nodes_dict = {node['id']: node for node in all_nodes}
+    unique_nodes = unique_nodes_dict.values()
+    print(f"Unique nodes count (after adding related): {len(unique_nodes)}")
+    print(f"Unique node IDs (keys of unique_nodes_dict): {list(unique_nodes_dict.keys())}")
+
+    # Filter relations to only include those whose start and end nodes are in unique_nodes
+    final_relations = []
+    print(f"Filtered relations (before final filter): {len(filtered_relations)}")
+    for rel in filtered_relations:
+        if rel['startNode'] in unique_nodes_dict and rel['endNode'] in unique_nodes_dict:
+            final_relations.append(rel)
+    print(f"Final relations count: {len(final_relations)}")
+
+    return {"nodes": list(unique_nodes), "relations": final_relations}
 
 @app.get("/labels", response_model=List[str])
 def get_labels():

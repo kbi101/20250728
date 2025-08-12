@@ -58,12 +58,13 @@ def list_nodes(skip: int = 0, limit: int = 10, name_filter: str = None, label_fi
     where_clauses = []
     parameters = {"skip": skip, "limit": limit}
 
-    if name_filter:
-        where_clauses.append("n.properties.name CONTAINS $name_filter")
+    if name_filter and name_filter.strip():
+        where_clauses.append("n.name IS NOT NULL AND toLower(n.name) CONTAINS toLower($name_filter)")
         parameters["name_filter"] = name_filter
 
-    if label_filter:
-        where_clauses.append(f"n:{label_filter}")
+    if label_filter and label_filter.strip():
+        where_clauses.append("ANY(label IN labels(n) WHERE label = $label_filter)")
+        parameters["label_filter"] = label_filter
 
     if where_clauses:
         query_parts.append("WHERE " + " AND ".join(where_clauses))
@@ -117,7 +118,7 @@ def list_relations(skip: int = 0, limit: int = 10, type_filter: str = None) -> l
     where_clauses = []
     parameters = {"skip": skip, "limit": limit}
 
-    if type_filter:
+    if type_filter and type_filter.strip():
         where_clauses.append("type(r) = $type_filter")
         parameters["type_filter"] = type_filter
 
