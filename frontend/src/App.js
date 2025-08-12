@@ -13,11 +13,19 @@ const App = () => {
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
   const [hoveredLink, setHoveredLink] = useState(null); // New state for hovered link
+  const [nodeNameFilter, setNodeNameFilter] = useState('');
+  const [nodeLabelFilter, setNodeLabelFilter] = useState('');
+  const [edgeTypeFilter, setEdgeTypeFilter] = useState('');
   const graphRef = useRef();
 
-  const fetchGraph = useCallback(async () => {
+  const fetchGraph = useCallback(async (filters = {}) => {
     try {
-      const response = await axios.get('http://localhost:8000/utils/export');
+      const params = {
+        name_filter: filters.nodeNameFilter || undefined,
+        label_filter: filters.nodeLabelFilter || undefined,
+        type_filter: filters.edgeTypeFilter || undefined,
+      };
+      const response = await axios.get('http://localhost:8000/utils/export', { params });
       const nodes = response.data.nodes.map(node => ({
         id: node.id,
         name: node.properties.name || node.id,
@@ -55,10 +63,14 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    fetchGraph();
+    fetchGraph(); // Initial fetch without filters
     fetchLabels();
     fetchRelationshipTypes(); // Fetch relationship types when component mounts
   }, [fetchGraph, fetchLabels, fetchRelationshipTypes]);
+
+  const handleSearch = () => {
+    fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter });
+  };
 
   const handleAddNode = async () => {
     if (!newNode.trim()) {
@@ -237,9 +249,9 @@ const App = () => {
         <button 
           onClick={() => setIsPanelOpen(!isPanelOpen)}
           style={{ 
-            position: 'absolute', 
-            left: '-30px', 
-            top: '10px', 
+            position: 'absolute',
+            left: '-30px',
+            top: '10px',
             background: '#fff',
             border: '1px solid #ccc',
             borderRight: 'none',
