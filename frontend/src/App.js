@@ -168,8 +168,8 @@ const App = () => {
           ctx.stroke();
 
           // Draw arrow
-          const ARROW_LENGTH = 3; // Length of the arrow head
-          const ARROW_WIDTH = 2; // Width of the arrow head
+          const ARROW_LENGTH = 6; // Length of the arrow head
+          const ARROW_WIDTH = 4; // Width of the arrow head
 
           const endX = end.x;
           const endY = end.y;
