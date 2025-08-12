@@ -12,6 +12,7 @@ const App = () => {
   const [availableRelationshipTypes, setAvailableRelationshipTypes] = useState([]); // New state for available relationship types
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
+  const [hoveredLink, setHoveredLink] = useState(null); // New state for hovered link
   const graphRef = useRef();
 
   const fetchGraph = useCallback(async () => {
@@ -149,6 +150,33 @@ const App = () => {
         linkLabel="type"
         linkDirectionalArrowLength={3.5}
         linkDirectionalArrowRelPos={1}
+        onLinkHover={link => setHoveredLink(link)}
+        linkCanvasObject={(link, ctx, color) => {
+          const start = link.source;
+          const end = link.target;
+
+          // ignore if link not yet rendered
+          if (!start || !end) return;
+
+          const interpolate = (start, end, t) => ({ x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t });
+          const p = interpolate(start, end, 0.5); // Mid-point of the link
+
+          ctx.beginPath();
+          ctx.moveTo(start.x, start.y);
+          ctx.lineTo(end.x, end.y);
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          if (link === hoveredLink) {
+            const fontSize = 12 / (graphRef.current?.zoom() || 1);
+            ctx.font = `${fontSize}px Sans-Serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = 'black';
+            ctx.fillText(link.type, p.x, p.y - 5); // Display type slightly above the link
+          }
+        }}
       />
       {contextMenu && (
         <div 
