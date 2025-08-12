@@ -101,3 +101,8 @@ def list_relations(skip: int = 0, limit: int = 10) -> list[dict]:
     query = "MATCH (a)-[r]->(b) RETURN type(r) as type, r.id as id, r as properties, a.id as startNode, b.id as endNode SKIP $skip LIMIT $limit"
     result = db.query(query, parameters={"skip": skip, "limit": limit})
     return [_relation_to_dict(record) for record in result]
+
+def get_all_labels() -> list[str]:
+    query = "CALL db.labels()"
+    result = db.query(query)
+    return [record["label"] for record in result]

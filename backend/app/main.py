@@ -77,6 +77,10 @@ def export_data():
 
     return {"nodes": list(unique_nodes), "relations": relations}
 
+@app.get("/labels", response_model=List[str])
+def get_labels():
+    return crud.get_all_labels()
+
 @app.post("/utils/import")
 async def import_data(file: UploadFile = File(...)):
     # Clear database

@@ -5,6 +5,8 @@ import axios from 'axios';
 const App = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [newNode, setNewNode] = useState('');
+  const [newNodeLabels, setNewNodeLabels] = useState(''); // New state for labels
+  const [availableLabels, setAvailableLabels] = useState([]); // New state for available labels
   const [newEdge, setNewEdge] = useState({ source: { id: '', name: '' }, target: { id: '', name: '' } });
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [contextMenu, setContextMenu] = useState(null);
@@ -30,21 +32,36 @@ const App = () => {
     }
   }, []);
 
+  const fetchLabels = useCallback(async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/labels');
+      setAvailableLabels(response.data);
+    } catch (error) {
+      console.error('Error fetching labels:', error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchGraph();
-  }, [fetchGraph]);
+    fetchLabels(); // Fetch labels when component mounts
+  }, [fetchGraph, fetchLabels]);
 
   const handleAddNode = async () => {
     if (!newNode.trim()) {
       alert('Node name cannot be empty');
       return;
     }
+    const labelsArray = newNodeLabels.split(',').map(label => label.trim()).filter(label => label !== '');
+    if (labelsArray.length === 0) {
+      labelsArray.push('Custom'); // Default label if none provided
+    }
     try {
       await axios.post('http://localhost:8000/nodes', { 
-        labels: ['Custom'], 
+        labels: labelsArray, 
         properties: { name: newNode, x: 0, y: 0 } 
       });
       setNewNode('');
+      setNewNodeLabels(''); // Clear labels input
       fetchGraph();
     } catch (error) {
       console.error('Error adding node:', error);
@@ -172,6 +189,29 @@ const App = () => {
             placeholder="Node name"
             style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
           />
+          <input
+            type="text"
+            value={newNodeLabels}
+            onChange={(e) => setNewNodeLabels(e.target.value)}
+            placeholder="Labels (comma-separated)"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
+          />
+          {availableLabels.length > 0 && (
+            <select
+              multiple
+              onChange={(e) => {
+                const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
+                setNewNodeLabels(selectedOptions.join(','));
+              }}
+              style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px', minHeight: '50px' }}
+            >
+              {availableLabels.map(label => (
+                <option key={label} value={label}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          )}
           <button onClick={handleAddNode} style={{ width: '100%', padding: '10px', marginTop: '10px' }}>Add Node</button>
         </div>
         <div>
