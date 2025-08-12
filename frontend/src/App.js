@@ -89,12 +89,17 @@ const App = () => {
 
   useEffect(() => {
     const savedFilters = getCookie('graphFilters');
+    console.log('Saved filters from cookie:', savedFilters);
     let initialFilters = {};
     if (savedFilters) {
       initialFilters = JSON.parse(savedFilters);
       setNodeNameFilter(initialFilters.nodeNameFilter || '');
       setNodeLabelFilter(initialFilters.nodeLabelFilter || '');
       setEdgeTypeFilter(initialFilters.edgeTypeFilter || '');
+      console.log('Initial filters applied:', initialFilters);
+      console.log('Node Name Filter state:', initialFilters.nodeNameFilter || '');
+      console.log('Node Label Filter state:', initialFilters.nodeLabelFilter || '');
+      console.log('Edge Type Filter state:', initialFilters.edgeTypeFilter || '');
     }
     fetchGraph(initialFilters); // Initial fetch with filters from cookie
     fetchLabels();
@@ -228,7 +233,28 @@ const App = () => {
           // Draw link line
           ctx.beginPath();
           ctx.moveTo(startX, startY);
-          ctx.lineTo(endX, endY);
+          // Calculate midpoint
+          const midX = (startX + endX) / 2;
+          const midY = (startY + endY) / 2;
+
+          // Calculate perpendicular vector
+          const dx = endX - startX;
+          const dy = endY - startY;
+          const perpendicularDx = -dy;
+          const perpendicularDy = dx;
+
+          // Normalize perpendicular vector
+          const norm = Math.sqrt(perpendicularDx * perpendicularDx + perpendicularDy * perpendicularDy);
+          const normalizedPerpendicularDx = perpendicularDx / norm;
+          const normalizedPerpendicularDy = perpendicularDy / norm;
+
+          // Control point offset (adjust for desired curvature)
+          const curveOffset = 20; // Adjust this value for more or less curve
+
+          const controlX = midX + normalizedPerpendicularDx * curveOffset;
+          const controlY = midY + normalizedPerpendicularDy * curveOffset;
+
+          ctx.quadraticCurveTo(controlX, controlY, endX, endY);
           ctx.strokeStyle = color; // Use default link color
           ctx.lineWidth = 0.5; // Link line width 0.5
           ctx.stroke();
