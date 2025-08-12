@@ -167,6 +167,25 @@ const App = () => {
           ctx.lineWidth = 0.5; // Link line width 0.5
           ctx.stroke();
 
+          // Draw arrow
+          const ARROW_LENGTH = 3; // Length of the arrow head
+          const ARROW_WIDTH = 2; // Width of the arrow head
+
+          const endX = end.x;
+          const endY = end.y;
+          const startX = start.x;
+          const startY = start.y;
+
+          const angle = Math.atan2(endY - startY, endX - startX);
+
+          ctx.beginPath();
+          ctx.moveTo(endX, endY);
+          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle - Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle + Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle + Math.PI / 6));
+          ctx.closePath();
+          ctx.fillStyle = color; // Use default link color for arrow
+          ctx.fill();
+
           // Draw type on hover
           if (link === hoveredLink) {
             const interpolate = (start, end, t) => ({ x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t });
@@ -180,8 +199,6 @@ const App = () => {
             ctx.fillText(link.type, p.x, p.y - 5); // Display type slightly above the link
           }
         }}
-        linkDirectionalArrowLength={3.5}
-        linkDirectionalArrowRelPos={1}
       />
       {contextMenu && (
         <div 
