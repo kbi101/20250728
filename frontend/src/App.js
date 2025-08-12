@@ -33,7 +33,8 @@ const App = () => {
         name: node.properties.name || node.id,
         x: node.properties.x,
         y: node.properties.y,
-        val: 10
+        val: 10,
+        properties: node.properties // Include all properties
       }));
       const links = response.data.relations.map(relation => ({
         source: relation.startNode,

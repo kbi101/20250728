@@ -5,6 +5,7 @@ from neo4j.graph import Node as Neo4jNode, Relationship as Neo4jRelationship
 def _node_to_dict(node: Neo4jNode) -> dict:
     """Converts a neo4j Node to a dictionary."""
     properties = dict(node)
+    print(f"Properties from Neo4j node: {properties}")
     return {
         "id": node.get("id"),
         "labels": list(node.labels),
