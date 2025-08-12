@@ -124,7 +124,7 @@ const App = () => {
       setNewNode('');
       setNewNodeLabels(''); // Clear labels input
       setNewNodeDesc(''); // Clear description input
-      fetchGraph();
+      fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter });
     } catch (error) {
       console.error('Error adding node:', error);
     }
@@ -145,7 +145,7 @@ const App = () => {
       });
       setNewEdge({ source: { id: '', name: '' }, target: { id: '', name: '' } });
       setNewEdgeType(''); // Clear edge type input
-      fetchGraph();
+      fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter });
     } catch (error) {
       console.error('Error adding edge:', error);
     }
