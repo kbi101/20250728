@@ -6,6 +6,7 @@ const App = () => {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [newNode, setNewNode] = useState('');
   const [newNodeLabels, setNewNodeLabels] = useState(''); // New state for labels
+  const [newNodeDesc, setNewNodeDesc] = useState(''); // New state for node description
   const [availableLabels, setAvailableLabels] = useState([]); // New state for available labels
   const [newEdge, setNewEdge] = useState({ source: { id: '', name: '' }, target: { id: '', name: '' } });
   const [newEdgeType, setNewEdgeType] = useState(''); // New state for edge type
@@ -85,10 +86,11 @@ const App = () => {
     try {
       await axios.post('http://localhost:8000/nodes', { 
         labels: labelsArray, 
-        properties: { name: newNode, x: 0, y: 0 } 
+        properties: { name: newNode, x: 0, y: 0, desc: newNodeDesc } 
       });
       setNewNode('');
       setNewNodeLabels(''); // Clear labels input
+      setNewNodeDesc(''); // Clear description input
       fetchGraph();
     } catch (error) {
       console.error('Error adding node:', error);
@@ -311,6 +313,13 @@ const App = () => {
             value={newNodeLabels}
             onChange={(e) => setNewNodeLabels(e.target.value)}
             placeholder="Labels (comma-separated)"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
+          />
+          <input
+            type="text"
+            value={newNodeDesc}
+            onChange={(e) => setNewNodeDesc(e.target.value)}
+            placeholder="Description (optional)"
             style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
           />
           {availableLabels.length > 0 && (
