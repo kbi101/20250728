@@ -178,13 +178,19 @@ const App = () => {
 
           const angle = Math.atan2(endY - startY, endX - startX);
 
+          // Adjust end point to circumference of target node
+          const nodeRadius = 5; // Assuming node radius is 5, same as in nodeCanvasObject
+          const dist = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+          const newEndX = endX - (nodeRadius * (endX - startX)) / dist;
+          const newEndY = endY - (nodeRadius * (endY - startY)) / dist;
+
           ctx.beginPath();
-          ctx.moveTo(endX, endY);
-          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle - Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle - Math.PI / 6));
-          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle + Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle + Math.PI / 6));
+          ctx.moveTo(newEndX, newEndY);
+          ctx.lineTo(newEndX - ARROW_LENGTH * Math.cos(angle - Math.PI / 6), newEndY - ARROW_LENGTH * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(newEndX - ARROW_LENGTH * Math.cos(angle + Math.PI / 6), newEndY - ARROW_LENGTH * Math.sin(angle + Math.PI / 6));
           ctx.closePath();
-          ctx.fillStyle = color; // Use default link color for arrow
-          ctx.fill();
+          ctx.strokeStyle = color; // Use default link color for arrow stroke
+          ctx.stroke(); // Draw stroke instead of fill
 
           // Draw type on hover
           if (link === hoveredLink) {
