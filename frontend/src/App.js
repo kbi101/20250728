@@ -251,6 +251,31 @@ const App = () => {
         </button>
         <h2>Control Panel</h2>
         <div style={{ marginBottom: '20px' }}>
+          <h3>Search and Filter</h3>
+          <input
+            type="text"
+            value={nodeNameFilter}
+            onChange={(e) => setNodeNameFilter(e.target.value)}
+            placeholder="Filter by Node Name"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginBottom: '10px' }}
+          />
+          <input
+            type="text"
+            value={nodeLabelFilter}
+            onChange={(e) => setNodeLabelFilter(e.target.value)}
+            placeholder="Filter by Node Label"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginBottom: '10px' }}
+          />
+          <input
+            type="text"
+            value={edgeTypeFilter}
+            onChange={(e) => setEdgeTypeFilter(e.target.value)}
+            placeholder="Filter by Edge Type"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginBottom: '10px' }}
+          />
+          <button onClick={handleSearch} style={{ width: '100%', padding: '10px', marginTop: '10px' }}>Apply Filters</button>
+        </div>
+        <div style={{ marginBottom: '20px' }}>
           <h3>Add Node</h3>
           <input
             type="text"
