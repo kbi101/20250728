@@ -158,7 +158,7 @@ const App = () => {
           ctx.textBaseline = 'middle';
           ctx.strokeStyle = '#00008B'; // Dark Blue for stroke
           ctx.beginPath();
-          ctx.arc(node.x, node.y, 5, 0, 2 * Math.PI, false); // Node size 5
+          ctx.arc(node.x, node.y, 3, 0, 2 * Math.PI, false); // Node size 3
           ctx.stroke(); // Draw stroke instead of fill
           ctx.fillStyle = 'black';
           ctx.fillText(label, node.x, node.y + 10);
@@ -184,35 +184,33 @@ const App = () => {
           // ignore if link not yet rendered
           if (!start || !end) return;
 
+          const nodeRadius = 3; // Assuming node radius is 3, same as in nodeCanvasObject
+
+          // Adjust start and end points to circumference of nodes
+          const dist = Math.sqrt(Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2));
+          const startX = start.x + (nodeRadius * (end.x - start.x)) / dist;
+          const startY = start.y + (nodeRadius * (end.y - start.y)) / dist;
+          const endX = end.x - (nodeRadius * (end.x - start.x)) / dist;
+          const endY = end.y - (nodeRadius * (end.y - startY)) / dist;
+
           // Draw link line
           ctx.beginPath();
-          ctx.moveTo(start.x, start.y);
-          ctx.lineTo(end.x, end.y);
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
           ctx.strokeStyle = color; // Use default link color
           ctx.lineWidth = 0.5; // Link line width 0.5
           ctx.stroke();
 
           // Draw arrow
-          const ARROW_LENGTH = 8; // Length of the arrow head
-          const ARROW_WIDTH = 5; // Width of the arrow head
-
-          const endX = end.x;
-          const endY = end.y;
-          const startX = start.x;
-          const startY = start.y;
+          const ARROW_LENGTH = 5; // Length of the arrow head
+          const ARROW_WIDTH = 3; // Width of the arrow head
 
           const angle = Math.atan2(endY - startY, endX - startX);
 
-          // Adjust end point to circumference of target node
-          const nodeRadius = 5; // Assuming node radius is 5, same as in nodeCanvasObject
-          const dist = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-          const newEndX = endX - (nodeRadius * (endX - startX)) / dist;
-          const newEndY = endY - (nodeRadius * (endY - startY)) / dist;
-
           ctx.beginPath();
-          ctx.moveTo(newEndX, newEndY);
-          ctx.lineTo(newEndX - ARROW_LENGTH * Math.cos(angle - Math.PI / 6), newEndY - ARROW_LENGTH * Math.sin(angle - Math.PI / 6));
-          ctx.lineTo(newEndX - ARROW_LENGTH * Math.cos(angle + Math.PI / 6), newEndY - ARROW_LENGTH * Math.sin(angle + Math.PI / 6));
+          ctx.moveTo(endX, endY);
+          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle - Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle - Math.PI / 6));
+          ctx.lineTo(endX - ARROW_LENGTH * Math.cos(angle + Math.PI / 6), endY - ARROW_LENGTH * Math.sin(angle + Math.PI / 6));
           ctx.closePath();
           ctx.strokeStyle = color; // Use default link color for arrow stroke
           ctx.stroke(); // Draw stroke instead of fill
