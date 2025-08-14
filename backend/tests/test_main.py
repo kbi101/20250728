@@ -6,7 +6,7 @@ from app import models
 
 @pytest.fixture
 def mock_crud():
-    with patch('app.crud') as mock_crud:
+    with patch('app.main.crud') as mock_crud:
         yield mock_crud
 
 @pytest.mark.anyio
