@@ -49,7 +49,7 @@ const App = () => {
         label_filter: filters.nodeLabelFilter || undefined,
         type_filter: filters.edgeTypeFilter || undefined,
       };
-      const response = await axios.get('http://localhost:8000/utils/export', { params });
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/utils/export`, { params });
       const nodes = response.data.nodes.map(node => ({
         id: node.id,
         name: node.properties.name || node.id,
@@ -71,7 +71,7 @@ const App = () => {
 
   const fetchLabels = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:8000/labels');
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/labels`);
       setAvailableLabels(response.data);
     } catch (error) {
       console.error('Error fetching labels:', error);
@@ -80,7 +80,7 @@ const App = () => {
 
   const fetchRelationshipTypes = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:8000/relationship_types');
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/relationship_types`);
       setAvailableRelationshipTypes(response.data);
     } catch (error) {
       console.error('Error fetching relationship types:', error);
@@ -122,7 +122,7 @@ const App = () => {
       labelsArray.push('Custom'); // Default label if none provided
     }
     try {
-      await axios.post('http://localhost:8000/nodes', { 
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/nodes`, { 
         labels: labelsArray, 
         properties: { name: newNode, x: 0, y: 0, desc: newNodeDesc } 
       });
@@ -142,7 +142,7 @@ const App = () => {
     }
     const edgeType = newEdgeType.trim() || 'RELATED_TO'; // Default type if none provided
     try {
-      await axios.post('http://localhost:8000/relations', { 
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/relations`, { 
         startNode: newEdge.source.id, 
         endNode: newEdge.target.id, 
         type: edgeType,
@@ -158,7 +158,7 @@ const App = () => {
 
   const handleNodeDragEnd = async (node) => {
     try {
-      await axios.put(`http://localhost:8000/nodes/${node.id}`, {
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/nodes/${node.id}`, {
         properties: { x: node.x, y: node.y }
       });
     } catch (error) {
@@ -372,13 +372,6 @@ const App = () => {
             placeholder="Labels (comma-separated)"
             style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
           />
-          <input
-            type="text"
-            value={newNodeDesc}
-            onChange={(e) => setNewNodeDesc(e.target.value)}
-            placeholder="Description (optional)"
-            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
-          />
           {availableLabels.length > 0 && (
             <select
               multiple
@@ -395,6 +388,13 @@ const App = () => {
               ))}
             </select>
           )}
+          <input
+            type="text"
+            value={newNodeDesc}
+            onChange={(e) => setNewNodeDesc(e.target.value)}
+            placeholder="Description (optional)"
+            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', marginTop: '10px' }}
+          />
           <button onClick={handleAddNode} style={{ width: '100%', padding: '10px', marginTop: '10px' }}>Add Node</button>
         </div>
         <div>

@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -7,7 +8,7 @@ import json
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",
+    os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000"),
 ]
 
 app.add_middleware(
