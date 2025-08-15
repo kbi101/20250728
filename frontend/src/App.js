@@ -179,12 +179,14 @@ const App = () => {
   };
 
   const handleDeleteNode = async (nodeId) => {
-    try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/nodes/${nodeId}`);
-      fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter }); // Refresh graph
-      closeContextMenu();
-    } catch (error) {
-      console.error('Error deleting node:', error);
+    if (window.confirm('Are you sure you want to delete this node? This action cannot be undone.')) {
+      try {
+        await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/nodes/${nodeId}`);
+        fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter }); // Refresh graph
+        closeContextMenu();
+      } catch (error) {
+        console.error('Error deleting node:', error);
+      }
     }
   };
 
