@@ -178,6 +178,16 @@ const App = () => {
     setContextMenu(null);
   };
 
+  const handleDeleteNode = async (nodeId) => {
+    try {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/nodes/${nodeId}`);
+      fetchGraph({ nodeNameFilter, nodeLabelFilter, edgeTypeFilter }); // Refresh graph
+      closeContextMenu();
+    } catch (error) {
+      console.error('Error deleting node:', error);
+    }
+  };
+
   return (
     <div style={{ position: 'relative', height: '100vh' }} onClick={closeContextMenu}>
       <ForceGraph2D
@@ -302,6 +312,8 @@ const App = () => {
         >
           <div style={{ cursor: 'pointer' }} onClick={() => { setNewEdge({ ...newEdge, source: { id: contextMenu.node.id, name: contextMenu.node.name } }); closeContextMenu(); }}>Set as Source</div>
           <div style={{ cursor: 'pointer' }} onClick={() => { setNewEdge({ ...newEdge, target: { id: contextMenu.node.id, name: contextMenu.node.name } }); closeContextMenu(); }}>Set as Target</div>
+          <hr style={{ margin: '5px 0' }} /> {/* Separator */}
+          <div style={{ cursor: 'pointer', color: 'red' }} onClick={() => handleDeleteNode(contextMenu.node.id)}>Delete Node</div>
         </div>
       )}
       <div style={{
