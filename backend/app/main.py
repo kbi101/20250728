@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from . import crud, models
 import json
+from fastapi.staticfiles import StaticFiles
+from starlette.responses import FileResponse
 
 app = FastAPI()
 
@@ -158,3 +160,14 @@ async def import_data(file: UploadFile = File(...)):
         relations_created += 1
 
     return {"nodes_created": nodes_created, "relations_created": relations_created}
+
+# Serve static files for the frontend
+app.mount("/static", StaticFiles(directory="./frontend_build/static"), name="static")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """
+    Serves the frontend's index.html for all other routes,
+    allowing client-side routing to work.
+    """
+    return FileResponse("./frontend_build/index.html")

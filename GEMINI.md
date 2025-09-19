@@ -8,4 +8,11 @@
 
 ** The code should be in checked in status before any change makes. Once change is done and owner confirmed "it is working and please commit", the code should be commited and pushed
 
+build
+ocker-compose -f deployment/docker-compose.yml build 
 
+local start
+uvicorn app.main:app --host 0.0.0.0 --port 8002
+export REACT_APP_BACKEND_URL=http://localhost:8000
+export FRONTEND_ORIGIN=http://localhost:3000
+Nom start

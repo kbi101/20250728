@@ -20,8 +20,7 @@ docker-compose -f docker-compose.yml up -d
 
 if [ $? -eq 0 ]; then
   echo "Docker containers started successfully in detached mode."
-  echo "Frontend accessible at http://localhost:3002"
-  echo "Backend accessible at http://localhost:8002"
+  echo "Application accessible at http://localhost:3002"
 else
   echo "Error: Docker containers failed to start."
   exit 1

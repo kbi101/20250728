@@ -1,20 +1,11 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ..
-      dockerfile: ./deployment/frontend.Dockerfile
-    ports:
-      - "3002:80"
-
   backend:
     build:
       context: ..
       dockerfile: ./deployment/backend.Dockerfile
     ports:
-      - "8002:8000"
+      - "3002:8000"
     volumes:
       - ./config.ini:/app/backend/config.ini
-    environment:
-      - FRONTEND_ORIGIN=http://localhost:3002
